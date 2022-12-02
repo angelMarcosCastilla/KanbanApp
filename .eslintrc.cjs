@@ -24,7 +24,9 @@ module.exports = {
     '@typescript-eslint',
   ],
   rules: {
-    'prettier/prettier': 'error',
     '@typescript-eslint/explicit-function-return-type': 'off',
+    'prettier/prettier': ['error', { endOfLine: 'auto' }],
+    'react/react-in-jsx-scope': 'off',
+    '@typescript-eslint/no-misused-promises': 'off',
   },
 };
