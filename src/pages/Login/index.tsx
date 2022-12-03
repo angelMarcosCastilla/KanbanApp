@@ -14,22 +14,35 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { schemeLogin } from '@/validationScheme/auth';
 import { loginForm } from '@/interfaces/auth';
 import { login } from '@/services/auth';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<loginForm>({ resolver: yupResolver(schemeLogin) });
 
-  const handleLogin = (data: loginForm) => {
-    login(data)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const handleLogin = async (data: loginForm) => {
+    try {
+      setLoading(true);
+      const res = await login(data);
+      if (!res?.isLogged) {
+        setError(res.field, {
+          type: 'required',
+          message: res.message,
+        });
+      } else {
+        navigate('/');
+      }
+      setLoading(false);
+    } catch {
+      console.log('error');
+    }
   };
 
   return (
@@ -53,12 +66,11 @@ export default function Login() {
               {...register('email')}
             />
             <FormErrorMessage>
-              {' '}
               {errors?.email != null && errors.email?.message}
             </FormErrorMessage>
           </FormControl>
-          <FormControl mb={4} isInvalid={Boolean(errors.email)}>
-            <FormLabel>Email </FormLabel>
+          <FormControl mb={4} isInvalid={Boolean(errors.password)}>
+            <FormLabel>Password </FormLabel>
             <Input
               size="lg"
               type="password"
@@ -75,9 +87,9 @@ export default function Login() {
             boxShadow="0 0  20px theme.red.500"
             my={3}
             size={'lg'}
-            leftIcon={<span>spanicon</span>}
             colorScheme="blue"
             width="100%"
+            isLoading={loading}
             loadingText="ingresando..."
           >
             Button
