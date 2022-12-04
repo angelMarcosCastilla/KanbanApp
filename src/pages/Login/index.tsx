@@ -5,6 +5,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  Link,
   Stack,
   Text,
 } from '@chakra-ui/react';
@@ -15,7 +16,8 @@ import { schemeLogin } from '@/validationScheme/auth';
 import { loginForm } from '@/interfaces/auth';
 import { login } from '@/services/auth';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link as LinkRoute, useNavigate } from 'react-router-dom';
+import PasswordInput from '@/components/PasswordInput';
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
@@ -71,9 +73,8 @@ export default function Login() {
           </FormControl>
           <FormControl mb={4} isInvalid={Boolean(errors.password)}>
             <FormLabel>Password </FormLabel>
-            <Input
+            <PasswordInput
               size="lg"
-              type="password"
               placeholder="Ingrese su password"
               {...register('password')}
             />
@@ -95,6 +96,12 @@ export default function Login() {
             Button
           </Button>
         </form>
+        <Text textAlign="center" color="gray.500">
+          Don`&apos;t have a account?{' '}
+          <Link color="blue.600" as={LinkRoute} to="/register">
+            Sign up
+          </Link>
+        </Text>
       </Card>
     </Stack>
   );
