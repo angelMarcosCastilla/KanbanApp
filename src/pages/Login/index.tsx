@@ -9,18 +9,22 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
-
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { schemeLogin } from '@/validationScheme/auth';
 import { loginForm } from '@/interfaces/auth';
-import { login } from '@/services/auth';
 import { useState } from 'react';
 import { Link as LinkRoute, useNavigate } from 'react-router-dom';
 import PasswordInput from '@/components/PasswordInput';
+import { useDispatch } from 'react-redux';
+import { loginReducer } from '@/store/user';
+import { login } from '@/services/auth';
+import { setUser } from '@/utilities/locastorage';
+import useUser from '@/hooks/useUser';
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
+  const { user } = useUser();
   const navigate = useNavigate();
   const {
     register,
@@ -28,25 +32,27 @@ export default function Login() {
     setError,
     formState: { errors },
   } = useForm<loginForm>({ resolver: yupResolver(schemeLogin) });
+  const dispatch = useDispatch();
 
   const handleLogin = async (data: loginForm) => {
     try {
       setLoading(true);
       const res = await login(data);
-      if (!res?.isLogged) {
-        setError(res.field, {
-          type: 'required',
-          message: res.message,
-        });
-      } else {
-        navigate('/');
-      }
+      dispatch(loginReducer(res.data));
       setLoading(false);
-    } catch {
-      console.log('error');
+      setUser(res.data);
+      navigate('/');
+    } catch (err: any) {
+      setLoading(false);
+      setError(err.response.data.field, {
+        type: 'required',
+        message: err.response.data.message,
+      });
     }
   };
 
+  if (user === undefined) return <h1>Loading</h1>;
+  if (user !== null) navigate('/');
   return (
     <Stack
       alignItems="center"

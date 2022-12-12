@@ -1,4 +1,5 @@
 import PasswordInput from '@/components/PasswordInput';
+import useUser from '@/hooks/useUser';
 import { registerData, registerForm } from '@/interfaces/auth';
 import { registerUser } from '@/services/auth';
 import { ShemeRegister } from '@/validationScheme/auth';
@@ -19,6 +20,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Register() {
   const [loading, setLoading] = useState(false);
+  const { user } = useUser();
   const navigate = useNavigate();
   const {
     register,
@@ -46,6 +48,9 @@ export default function Register() {
       setLoading(false);
     } catch {}
   };
+
+  if (user === undefined) return <h1>Loading</h1>;
+  if (user !== null) navigate('/');
   return (
     <Stack
       alignItems="center"
